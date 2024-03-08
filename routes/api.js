@@ -32,12 +32,14 @@ module.exports = function (app) {
         if (err) {
           res.status(500).send('Error fetching books');
         } else {
-          const formattedBooks = books.map(book => ({
-            _id: book._id,
-            title: book.title,
-            commentcount: book.comments.length,
-            comments: book.comments
-          }));
+          const formattedBooks = books.map(book => {
+            return {
+              _id: book._id,
+              title: book.title,
+              commentcount: book.comments.length,
+              comments: book.comments
+            }
+          });
           res.json(formattedBooks);
         }
       });
@@ -46,7 +48,7 @@ module.exports = function (app) {
     .post(function (req, res){
       let title = req.body.title;
       if (!title) {
-        res.json({ error: 'missing required field title'});
+        res.send('missing required field title');
       } else {
         const newBook = { title, comments: [] };
         myDataBase.collection('books').insertOne(newBook, (err, result) => {
@@ -64,7 +66,7 @@ module.exports = function (app) {
         if (err) {
           res.json({ error: 'Error deleting books'});
         } else {
-          res.send('delete successful');
+          res.send('complete delete successful');
         }
       });
     });
@@ -73,14 +75,14 @@ module.exports = function (app) {
     .get(function (req, res){
       let bookid = req.params.id;
       if (!ObjectId.isValid(bookid)) {
-        return res.json({ error: 'no book exists'});
+        return res.send('no book exists');
       }
 
       myDataBase.collection('books').findOne({ _id: new ObjectId(bookid) }, (err, book) => {
         if (err) {
           res.json({ error: 'Error fetching book'});
         } else if (!book) {
-          res.json({ error: 'no book exists'});
+          res.send('no book exists');
         } else {
           res.json(book);
         }
@@ -92,11 +94,11 @@ module.exports = function (app) {
       let bookid = req.params.id;
       let comment = req.body.comment;
       if (!comment) {
-        return res.json({ error: 'missing required field comment'});
+        return res.send('missing required field comment');
       }
 
       if (!ObjectId.isValid(bookid)) {
-        return res.json({ error: 'no book exists'});
+        return res.send('no book exists');
       }
       //json res format same as .get
 
@@ -108,7 +110,7 @@ module.exports = function (app) {
           if (err) {
             res.json({ error: 'Error adding comment'});
           } else if (!result.value) {
-            res.json({ error: 'no book exists'});
+            res.send('no book exists');
           } else {
             res.json(result.value);
           }
@@ -119,14 +121,14 @@ module.exports = function (app) {
     .delete(function(req, res){
       let bookid = req.params.id;
       if (!ObjectId.isValid(bookid)) {
-        return res.json({ error: 'no book exists'});
+        return res.send('no book exists');
       }
 
       myDataBase.collection('books').deleteOne({ _id: new ObjectId(bookid) }, (err, result) => {
         if (err) {
           res.json({ error: 'Error deleting book'});
         } else if (result.deletedCount === 0) {
-          res.json({ error: 'no book exists'});
+          res.send('no book exists');
         } else {
           res.send('delete successful');
         }

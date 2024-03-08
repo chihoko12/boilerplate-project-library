@@ -36,7 +36,7 @@ module.exports = function (app) {
             _id: book._id,
             title: book.title,
             commentcount: book.comments.length,
-            comments: book.comment
+            comments: book.comments
           }));
           res.json(formattedBooks);
         }
@@ -64,7 +64,7 @@ module.exports = function (app) {
         if (err) {
           res.json({ error: 'Error deleting books'});
         } else {
-          res.send('complete delete successful');
+          res.send('delete successful');
         }
       });
     });
@@ -108,7 +108,7 @@ module.exports = function (app) {
           if (err) {
             res.json({ error: 'Error adding comment'});
           } else if (!result.value) {
-            res.json({ error: 'Book not found'});
+            res.json({ error: 'no book exists'});
           } else {
             res.json(result.value);
           }
@@ -119,14 +119,14 @@ module.exports = function (app) {
     .delete(function(req, res){
       let bookid = req.params.id;
       if (!ObjectId.isValid(bookid)) {
-        return res.json({ error: 'Invalid book ID'});
+        return res.json({ error: 'no book exists'});
       }
 
       myDataBase.collection('books').deleteOne({ _id: new ObjectId(bookid) }, (err, result) => {
         if (err) {
           res.json({ error: 'Error deleting book'});
         } else if (result.deletedCount === 0) {
-          res.json({ error: 'Book not found'});
+          res.json({ error: 'no book exists'});
         } else {
           res.send('delete successful');
         }

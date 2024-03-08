@@ -63,7 +63,7 @@ suite('Functional Tests', function() {
         .send({})
         .end(function(err,res) {
           assert.equal(res.status, 200);
-          assert.equal(res.body, 'missing required field title');
+          assert.equal(res.body.error, 'missing required field title');
           done();
         })
       });
